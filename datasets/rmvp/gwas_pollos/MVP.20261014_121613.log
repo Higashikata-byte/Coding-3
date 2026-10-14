@@ -1,0 +1,106 @@
+======================== Welcome to MVP =========================
+    an R package for Memory-efficient, Visualization-enhanced    
+     and Parallel-accelerated genome-wide association study      
+                      __  __  __   __  ___                       
+                     |  \/  | \ \ / / | _ \                      
+                     | |\/| |  \ V /  |  _/                      
+                     |_|  |_|   \_/   |_|        Version: 1.4.6  
+  Design & Maintain: Lilin Yin, Haohao Zhang, and Xiaolei Liu    
+  Contributors: Zhenshuang Tang, Jingya Xu, Dong Yin, Zhiwu      
+  Zhang, Xiaohui Yuan, Mengjin Zhu, Shuhong Zhao, Xinyun Li      
+  Mailto: xiaoleiliu@mail.hzau.edu.cn, ylilin@mail.hzau.edu.cn   
+=================================================================
+Start: 2026-10-14 12:16:13 -05 
+The log has been output to the file: datasets/rmvp/gwas_pollos/MVP.20261014_121613.log 
+Input data has 234 individuals and 434529 markers 
+Markers are detected to be stored by column 
+Analyzed trait: peso 
+Number of threads used: 9.6 
+No high performance math library detected! The computational efficiency would be greatly reduced
+Total 23 individuals are removed due to missings 
+Calculate allele frequency... 
+Eigen Decomposition on GRM 
+-------------------------GWAS Start------------------------- 
+General Linear Model (GLM) Start... 
+scanning...
+Genomic inflation factor (lambda): 1.3247 
+Writing results to local file 
+Mixed Linear Model (MLM) Start... 
+Variance components using: BRENT 
+Estimated Vg and Ve: 0.026853 0.069686 
+scanning...
+Genomic inflation factor (lambda): 1.0109 
+Writing results to local file 
+FarmCPU Start... 
+Current loop: 1 out of maximum of 10 
+seqQTN: 
+NULL 
+number of covariates in current loop is: 
+0 
+scanning... 
+Current loop: 2 out of maximum of 10 
+Optimizing Pseudo QTNs... 
+seqQTN: 
+211719 269851 378582 322045 337536 114523 344443 385013 409393 151262 
+number of covariates in current loop is: 
+10 
+scanning... 
+Current loop: 3 out of maximum of 10 
+Optimizing Pseudo QTNs... 
+seqQTN: 
+335094 322045 136358 61072 405321 151262 24549 169640 269851 38589 211719 337536 114523 385013 378582 344443 409393 
+number of covariates in current loop is: 
+17 
+scanning... 
+Current loop: 4 out of maximum of 10 
+Optimizing Pseudo QTNs... 
+seqQTN: 
+322045 269851 151262 337536 211719 115736 149385 335094 136358 316514 378582 344443 169640 405321 385013 61072 409393 24549 114523 38589 
+number of covariates in current loop is: 
+20 
+scanning... 
+Current loop: 5 out of maximum of 10 
+Optimizing Pseudo QTNs... 
+seqQTN: 
+322045 269851 151262 211719 337536 149385 136358 24549 335094 405321 316514 114523 344443 115736 61072 378582 169640 409393 385013 38589 
+number of covariates in current loop is: 
+20 
+scanning... 
+Genomic inflation factor (lambda): 0.8123 
+Writing results to local file 
+Significant level: 1.15e-07 
+---------------------Visualization Start-------------------- 
+Phenotype distribution Plotting 
+SNP_Density Plotting 
+Circular_Manhattan Plotting peso.GLM 
+Circular_Manhattan Plotting peso.MLM 
+Circular_Manhattan Plotting peso.FarmCPU 
+Rectangular_Manhattan Plotting peso.GLM 
+Rectangular_Manhattan Plotting peso.MLM 
+Rectangular_Manhattan Plotting peso.FarmCPU 
+Q_Q Plotting peso.GLM 
+Q_Q Plotting peso.MLM 
+Q_Q Plotting peso.FarmCPU 
+Multracks_Rectangular Plotting peso.GLM 
+Multracks_Rectangular Plotting peso.MLM 
+Multracks_Rectangular Plotting peso.FarmCPU 
+Multracks_QQ Plotting peso.GLM 
+Multracks_QQ Plotting peso.MLM 
+Multracks_QQ Plotting peso.FarmCPU 
+Multraits_QQ Plotting peso.GLM 
+Multraits_QQ Plotting peso.MLM 
+Multraits_QQ Plotting peso.FarmCPU 
+Results are stored at Working Directory: datasets/rmvp/gwas_pollos 
+End: 2026-10-14 12:17:24 -05 
+Total running time: 1m11s 
+===================== MVP ACCOMPLISHED ===================== 
+SNP_Density Plotting 
+Multracks_Rectangular Plotting peso.GLM 
+Multracks_Rectangular Plotting peso.MLM 
+Multracks_Rectangular Plotting peso.FarmCPU 
+Multracks_QQ Plotting peso.GLM 
+Multracks_QQ Plotting peso.MLM 
+Multracks_QQ Plotting peso.FarmCPU 
+Multraits_QQ Plotting peso.GLM 
+Multraits_QQ Plotting peso.MLM 
+Multraits_QQ Plotting peso.FarmCPU 

@@ -1,0 +1,214 @@
+---
+title: "Genome Wide Association Studies (GWAS)"
+author: "Flavio Lozano-Isla"
+format:
+  html:
+    toc: true
+    toc-location: left
+    number-sections: true
+    self-contained: true
+editor_options: 
+  chunk_output_type: console
+execute:
+  echo: false
+  warning: false
+---
+
+# Project Setup
+
+```{r}
+#| label:  setup
+
+cran <- c("devtools", "tidyverse", "openxlsx", "rMVP", "CMplot", "R.utils")
+git <- c("hemstrow/snpR") 
+
+suppressPackageStartupMessages({
+  for (pkg in cran) { 
+    if( !require(pkg, character.only = TRUE) ) {
+      install.packages(pkg)
+      library(pkg, character.only = TRUE)
+    } 
+  }
+  
+  for (pkg in git) {
+    if( !require(sub(".*/", "", pkg), character.only = TRUE) ) {
+      devtools::install_github(pkg, upgrade = TRUE)
+      library(sub(".*/", "", pkg), character.only = TRUE)
+    }
+  }
+}); remove(cran, git, pkg)
+
+source("https://inkaverse.com/docs.r")
+
+cat("Project: ", getwd(), "\n")
+cat("cores: ", parallel::detectCores())
+cores <- parallel::detectCores()*0.8
+session_info()
+
+
+```
+
+# Import data
+
+```{r}
+
+datos_completos <- read_csv2("datasets/tabla_pollos.csv")
+
+info <- datos_completos %>%
+  rename(id = "Sample ID", 
+         region = "Geographic region", 
+         distrito = "District")
+
+pheno <- datos_completos %>%
+  select(id = "Sample ID", peso = "body weight (kg)")
+
+names(pheno)
+
+geno <- snpR::read_vcf("datasets/chickens_small.vcf.gz")
+
+nombres_vcf <- sample.meta(geno)$sampID
+
+indices <- match(nombres_vcf, info$id)
+sample.meta(geno)$region <- info$region[indices]
+sample.meta(geno)$distrito <- info$distrito[indices]
+
+
+geno
+sample.meta(geno)
+snp.meta(geno)
+
+```
+
+# PCA raw-data
+
+```{r}
+pca <- plot_clusters(geno
+                     , facets = "region"
+                     , check_duplicates = T
+                     , plot_type = "pca"
+                     )
+
+pca$plots$pca
+```
+
+# rMVP: Memory-efficient, Visualization-enhanced, and Parallel-accelerated Genome-Wide Association Study
+
+## Import data
+
+```{r}
+
+pheno %>%
+  write_csv("datasets/pheno_pollos.csv")
+
+library(R.utils)
+
+if (!file.exists("datasets/chickens_small.vcf")) {
+  gunzip("datasets/chickens_small.vcf.gz", remove = FALSE)}
+
+
+MVP.Data(fileVCF = "datasets/chickens_small.vcf"
+         , filePhe = "datasets/pheno_pollos.csv"
+         , sep.phe = ","
+         , priority = "speed"
+         , fileKin = FALSE
+         , filePC = FALSE
+         , out = "datasets/rmvp/gwas_pollos"
+         )
+```
+
+## Kinship
+
+```{r}
+
+MVP.Data.Kin(fileKin = TRUE
+             , mvp_prefix = 'datasets/rmvp/gwas_pollos' 
+             , out = 'datasets/rmvp/gwas_pollos'
+             )
+```
+
+## Data input
+
+```{r}
+phenotype <- read.table("datasets/rmvp/gwas_pollos.phe", head = TRUE)
+genotype <- attach.big.matrix("datasets/rmvp/gwas_pollos.geno.desc")
+mapping <- read.table("datasets/rmvp/gwas_pollos.geno.map", head = TRUE)
+kinship <- attach.big.matrix("datasets/rmvp/gwas_pollos.kin.desc")
+```
+
+## GWAS
+
+```{r}
+phenotype %>% names()
+
+trait <- phenotype %>% select(1, "peso")
+
+imMVP <- MVP(
+  phe = trait
+  , geno = genotype
+  , map = mapping
+  , K = kinship
+  , method = c("GLM", "MLM", "FarmCPU")
+  , outpath = "datasets/rmvp/gwas_pollos"
+  , file.output = TRUE
+  , file.type = "csv"
+  , ncpus = cores
+  )
+
+gc()
+```
+
+## SNP density-plot
+
+```{r}
+MVP.Report(MVP = imMVP
+           , plot.type="d"
+           , col=c("darkgreen", "yellow", "red")
+           , file.type = "jpg", dpi = 300
+           , outpath = "datasets/rmvp/gwas_pollos"
+           )
+```
+
+## Phenotype distribution
+
+```{r}
+MVP.Hist(phe = trait
+         , outpath = "datasets/rmvp/gwas_pollos"
+         , file.type = "jpg", breakNum = 18, dpi = 300)
+```
+
+## Manhatan
+
+```{r}
+MVP.Report(imMVP
+           , plot.type = "m"
+           , multracks = TRUE
+           , threshold = c(1e-6, 1e-4)
+           , threshold.lty=c(1,2)
+           , threshold.lwd=c(1,1)
+           , threshold.col=c("black","grey")
+           , amplify = TRUE
+           , bin.size = 1e6
+           , chr.den.col = c("darkgreen", "yellow", "red")
+           , signal.col = c("red","green")
+           , signal.cex = c(1,1)
+           , file.type = "jpg", memo = "", dpi = 300
+           , outpath = "datasets/rmvp/gwas_pollos"
+        )
+```
+
+## Q-Q plot
+
+```{r}
+MVP.Report(imMVP
+           , plot.type = "q"
+           , col = c("dodgerblue1", "olivedrab3", "darkgoldenrod1")
+           , threshold = 1e6
+           , signal.pch = 19
+           , signal.cex = 1.5
+           , signal.col = "red"
+           , box = FALSE 
+           , multracks = TRUE
+           , file.type="jpg",memo="",dpi=300
+           , outpath = "datasets/rmvp/gwas_pollos"
+           )
+```
